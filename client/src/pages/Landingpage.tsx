@@ -84,7 +84,7 @@ export default function LandingPage() {
           <div className="flex flex-wrap justify-center gap-4">
             {user ? (
               <>
-                <Link to="/dashboard" className="bg-black text-white px-6 py-3 rounded hover:bg-gray-800">Go to Dashboard</Link>
+                <Link to="/dashboard" className="bg-black text-white px-6 py-3 rounded hover:bg-gray-800">Start Swapping</Link>
                 <Link to="/list-item" className="bg-white text-black px-6 py-3 rounded hover:bg-gray-200">List an Item</Link>
               </>
             ) : (
