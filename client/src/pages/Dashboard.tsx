@@ -1,13 +1,32 @@
 import React from 'react';
+import { useAuth } from '../context/AuthContext';
+import { useNavigate } from 'react-router-dom';
+import {
+  Container,
+  Typography,
+  Box,
+  Card,
+  CardContent,
+  Button,
+  List,
+  ListItem,
+  ListItemText,
+  AppBar,
+  Toolbar,
+  IconButton
+} from '@mui/material';
+
 
 const Dashboard = () => {
-  // Dummy data for now
-  const user = {
-    name: 'Devashree',
-    email: 'devashree@example.com',
-    points: 120,
+  const { user, logout } = useAuth();
+  const navigate = useNavigate();
+
+  const handleLogout = () => {
+    logout();
+    navigate('/');
   };
 
+  // Dummy data for now
   const uploadedItems = [
     { id: 1, title: 'Denim Jacket', status: 'Available' },
     { id: 2, title: 'Red Saree', status: 'Swapped' },
@@ -18,37 +37,89 @@ const Dashboard = () => {
     { id: 2, item: 'Woolen Scarf', status: 'Completed' },
   ];
 
+  if (!user) {
+    return null; // This shouldn't happen due to ProtectedRoute
+  }
+
   return (
-    <div className="p-6">
-      <h1 className="text-2xl font-bold mb-4">Welcome, {user.name}</h1>
+    <>
+      <AppBar position="static">
+        <Toolbar>
+          <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
+            ReWear Dashboard
+          </Typography>
+          <IconButton color="inherit" onClick={handleLogout}>
+            Logout
+          </IconButton>
+        </Toolbar>
+      </AppBar>
 
-      <div className="bg-white shadow rounded-lg p-4 mb-6">
-        <p><strong>Email:</strong> {user.email}</p>
-        <p><strong>Points:</strong> {user.points}</p>
-      </div>
+      <Container maxWidth="lg" sx={{ mt: 4 }}>
+        <Typography variant="h4" gutterBottom>
+          Welcome, {user.name}!
+        </Typography>
 
-      <div className="mb-6">
-        <h2 className="text-xl font-semibold mb-2">Your Uploaded Items</h2>
-        <ul className="space-y-2">
-          {uploadedItems.map(item => (
-            <li key={item.id} className="p-2 bg-gray-100 rounded-md">
-              {item.title} — <span className="text-sm italic">{item.status}</span>
-            </li>
-          ))}
-        </ul>
-      </div>
+        <Card sx={{ mb: 4 }}>
+          <CardContent>
+            <Typography variant="h6" gutterBottom>Your Profile</Typography>
+            <Typography><strong>Email:</strong> {user.email}</Typography>
+            <Typography><strong>Points:</strong> {user.points}</Typography>
+            <Typography><strong>Role:</strong> {user.isAdmin ? 'Admin' : 'User'}</Typography>
+          </CardContent>
+        </Card>
 
-      <div>
-        <h2 className="text-xl font-semibold mb-2">Your Swaps</h2>
-        <ul className="space-y-2">
-          {swaps.map(swap => (
-            <li key={swap.id} className="p-2 bg-gray-100 rounded-md">
-              {swap.item} — <span className="text-sm italic">{swap.status}</span>
-            </li>
-          ))}
-        </ul>
-      </div>
-    </div>
+        <Box sx={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 3 }}>
+          <Card>
+            <CardContent>
+              <Typography variant="h6" gutterBottom>Your Uploaded Items</Typography>
+              <List>
+                {uploadedItems.map(item => (
+                  <ListItem key={item.id}>
+                    <ListItemText
+                      primary={item.title}
+                      secondary={`Status: ${item.status}`}
+                    />
+                  </ListItem>
+                ))}
+              </List>
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardContent>
+              <Typography variant="h6" gutterBottom>Your Swaps</Typography>
+              <List>
+                {swaps.map(swap => (
+                  <ListItem key={swap.id}>
+                    <ListItemText
+                      primary={swap.item}
+                      secondary={`Status: ${swap.status}`}
+                    />
+                  </ListItem>
+                ))}
+              </List>
+            </CardContent>
+          </Card>
+        </Box>
+
+        <Box sx={{ mt: 4, display: 'flex', gap: 2 }}>
+          <Button
+            variant="contained"
+            color="primary"
+            onClick={() => navigate('/list-item')}
+          >
+            Add New Item
+          </Button>
+          <Button
+            variant="outlined"
+            color="secondary"
+            onClick={handleLogout}
+          >
+            Logout
+          </Button>
+        </Box>
+      </Container>
+    </>
   );
 };
 

@@ -1,5 +1,6 @@
 import React from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
+import { useAuth } from '../context/AuthContext';
 
 const categories = ['Tops', 'T-Shirts', 'Jeans', 'Formals', 'Ethnic-wear'];
 const featuredItems = [
@@ -10,11 +11,12 @@ const featuredItems = [
 const products = Array.from({ length: 8 }).map((_, i) => ({
   id: i + 1,
   title: `Item ${i + 1}`,
-  image: `/images/product${(i % 4) + 1}.jpg`,  
+  image: `/images/product${(i % 4) + 1}.jpg`,
 }));
 
 export default function LandingPage() {
   const navigate = useNavigate();
+  const { user } = useAuth();
 
   return (
     <div className="min-h-screen bg-white text-black">
@@ -25,9 +27,17 @@ export default function LandingPage() {
           <nav className="space-x-6">
             <a href="#" className="hover:underline">Home</a>
             <a href="#browse" className="hover:underline">Browse</a>
-            <a href="/list-item" className="hover:underline">List an Item</a>
-            <a href="/login" className="hover:underline">Login</a>
-            <a href="/signup" className="font-semibold hover:underline">Sign Up</a>
+            {user ? (
+              <>
+                <Link to="/dashboard" className="hover:underline">Dashboard</Link>
+                <Link to="/list-item" className="hover:underline">List an Item</Link>
+              </>
+            ) : (
+              <>
+                <Link to="/login" className="hover:underline">Login</Link>
+                <Link to="/signup" className="font-semibold hover:underline">Sign Up</Link>
+              </>
+            )}
           </nav>
         </div>
       </header>
@@ -44,30 +54,43 @@ export default function LandingPage() {
             Swap, Earn, and Rewear
           </h1>
           <div className="space-x-4">
-            <a
-              href="/signup"
-              className="px-6 py-3 bg-black text-white rounded-md font-medium"
-            >
-              Start Swapping
-            </a>
+            {user ? (
+              <>
+                <Link
+                  to="/dashboard"
+                  className="px-6 py-3 bg-black text-white rounded-md font-medium"
+                >
+                  Go to Dashboard
+                </Link>
+                <Link
+                  to="/list-item"
+                  className="px-6 py-3 bg-white text-black rounded-md font-medium"
+                >
+                  List an Item
+                </Link>
+              </>
+            ) : (
+              <>
+                <Link
+                  to="/signup"
+                  className="px-6 py-3 bg-black text-white rounded-md font-medium"
+                >
+                  Start Swapping
+                </Link>
+                <Link
+                  to="/login"
+                  className="px-6 py-3 bg-white text-black rounded-md font-medium"
+                >
+                  Login
+                </Link>
+              </>
+            )}
             <a
               href="#browse"
-              className="px-6 py-3 bg-white text-black rounded-md font-medium"
+              className="px-6 py-3 bg-green-600 text-white rounded-md font-medium"
             >
               Browse Items
             </a>
-            <a
-              href="/list-item"
-              className="px-6 py-3 bg-black text-white rounded-md font-medium"
-            >
-              List an Item
-            </a>
-            <button
-              onClick={() => navigate('/dashboard')}
-              className="px-6 py-3 bg-green-600 text-white rounded-md font-medium"
-            >
-              Go to Dashboard
-            </button>
           </div>
           <div className="mt-6 w-full max-w-xl">
             <input
