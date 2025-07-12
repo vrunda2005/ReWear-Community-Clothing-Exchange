@@ -1,157 +1,341 @@
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { useAuth } from '../context/AuthContext';
+import {
+  Container,
+  Typography,
+  Box,
+  Card,
+  CardContent,
+  TextField,
+  Button,
+  FormControl,
+  InputLabel,
+  Select,
+  MenuItem,
+  Chip,
+  Alert,
+  AppBar,
+  Toolbar,
+  IconButton,
+  CircularProgress
+} from '@mui/material';
+import API from '../services/api';
+
+const categories = ['Tops', 'T-Shirts', 'Jeans', 'Formals', 'Ethnic-wear', 'Dresses', 'Outerwear', 'Accessories'];
+const types = ['Shirt', 'Pants', 'Dress', 'Jacket', 'Sweater', 'Skirt', 'Shoes', 'Bag', 'Jewelry'];
+const sizes = ['XS', 'S', 'M', 'L', 'XL', 'XXL', 'One Size'];
+const conditions = ['New', 'Like New', 'Good', 'Fair', 'Used'];
 
 const AddItem = () => {
-  const [formData, setFormData] = useState({
+  const navigate = useNavigate();
+  const { user } = useAuth();
+  const [form, setForm] = useState({
     title: '',
     description: '',
     category: '',
     type: '',
     size: '',
     condition: '',
-    tags: '',
-    images: [] as File[],
+    tags: ''
   });
+  const [images, setImages] = useState<File[]>([]);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement> | { target: { name: string; value: unknown } }) => {
     const { name, value } = e.target;
-    setFormData(prev => ({ ...prev, [name]: value }));
+    setForm(prev => ({
+      ...prev,
+      [name]: value as string
+    }));
+    setError(''); // Clear error when user types
   };
 
-  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files) {
-      setFormData(prev => ({ ...prev, images: Array.from(e.target.files) }));
+      const filesArray = Array.from(e.target.files);
+      if (filesArray.length > 5) {
+        setError('Maximum 5 images allowed');
+        return;
+      }
+      setImages(filesArray);
+      setError('');
     }
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    console.log('Item Submitted:', formData);
-    alert("Item submitted (mock)!");
+    setLoading(true);
+    setError('');
+
+    try {
+      const formData = new FormData();
+
+      // Add form fields
+      Object.entries(form).forEach(([key, value]) => {
+        formData.append(key, value);
+      });
+
+      // Add images
+      images.forEach((image) => {
+        formData.append('images', image);
+      });
+
+      await API.post('/items', formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        },
+      });
+
+      alert('Item submitted successfully! It will be reviewed by our team.');
+      navigate('/dashboard');
+    } catch (err: any) {
+      setError(err.response?.data?.message || 'Error submitting item');
+    } finally {
+      setLoading(false);
+    }
   };
 
+  const removeImage = (index: number) => {
+    setImages(prev => prev.filter((_, i) => i !== index));
+  };
+
+  if (!user) {
+    return null;
+  }
+
   return (
-    <div className="max-w-3xl mx-auto p-6">
-      <h1 className="text-2xl font-bold mb-6">List a New Item</h1>
+    <>
+      <AppBar position="static">
+        <Toolbar>
+          <IconButton color="inherit" onClick={() => navigate(-1)}>
+            ← Back
+          </IconButton>
+          <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
+            Add New Item
+          </Typography>
+        </Toolbar>
+      </AppBar>
 
-      <form onSubmit={handleSubmit} className="space-y-4">
+      <Container maxWidth="md" sx={{ mt: 4 }}>
+        <Typography variant="h4" gutterBottom>
+          List Your Item
+        </Typography>
 
-        {/* Images */}
-        <div>
-          <label className="block mb-1 font-medium">Upload Images</label>
-          <input
-            type="file"
-            multiple
-            onChange={handleFileChange}
-            className="w-full border rounded px-3 py-2"
-          />
-        </div>
+        <Typography variant="body1" color="text.secondary" sx={{ mb: 4 }}>
+          Share your clothing items with the ReWear community. All items will be reviewed before being published.
+        </Typography>
 
-        {/* Title */}
-        <div>
-          <label className="block mb-1 font-medium">Title</label>
-          <input
-            type="text"
-            name="title"
-            value={formData.title}
-            onChange={handleChange}
-            className="w-full border rounded px-3 py-2"
-            required
-          />
-        </div>
+        {error && (
+          <Alert severity="error" sx={{ mb: 3 }}>
+            {error}
+          </Alert>
+        )}
 
-        {/* Description */}
-        <div>
-          <label className="block mb-1 font-medium">Description</label>
-          <textarea
-            name="description"
-            value={formData.description}
-            onChange={handleChange}
-            className="w-full border rounded px-3 py-2"
-            rows={4}
-            required
-          ></textarea>
-        </div>
+        <Card>
+          <CardContent>
+            <Box component="form" onSubmit={handleSubmit}>
+              {/* Basic Information */}
+              <Typography variant="h6" gutterBottom sx={{ mt: 2 }}>
+                Basic Information
+              </Typography>
 
-        {/* Category */}
-        <div>
-          <label className="block mb-1 font-medium">Category</label>
-          <select
-            name="category"
-            value={formData.category}
-            onChange={handleChange}
-            className="w-full border rounded px-3 py-2"
-            required
-          >
-            <option value="">Select Category</option>
-            <option value="Tops">Tops</option>
-            <option value="Bottoms">Bottoms</option>
-            <option value="Dresses">Dresses</option>
-            <option value="Ethnic">Ethnic</option>
-            <option value="Winter">Winter Wear</option>
-          </select>
-        </div>
+              <TextField
+                label="Item Title"
+                name="title"
+                value={form.title}
+                onChange={handleInputChange}
+                fullWidth
+                margin="normal"
+                required
+                placeholder="e.g., Vintage Denim Jacket"
+              />
 
-        {/* Type */}
-        <div>
-          <label className="block mb-1 font-medium">Type</label>
-          <input
-            type="text"
-            name="type"
-            value={formData.type}
-            onChange={handleChange}
-            className="w-full border rounded px-3 py-2"
-          />
-        </div>
+              <TextField
+                label="Description"
+                name="description"
+                value={form.description}
+                onChange={handleInputChange}
+                fullWidth
+                margin="normal"
+                required
+                multiline
+                rows={4}
+                placeholder="Describe your item in detail..."
+              />
 
-        {/* Size */}
-        <div>
-          <label className="block mb-1 font-medium">Size</label>
-          <input
-            type="text"
-            name="size"
-            value={formData.size}
-            onChange={handleChange}
-            className="w-full border rounded px-3 py-2"
-          />
-        </div>
+              {/* Item Details */}
+              <Typography variant="h6" gutterBottom sx={{ mt: 4 }}>
+                Item Details
+              </Typography>
 
-        {/* Condition */}
-        <div>
-          <label className="block mb-1 font-medium">Condition</label>
-          <select
-            name="condition"
-            value={formData.condition}
-            onChange={handleChange}
-            className="w-full border rounded px-3 py-2"
-          >
-            <option value="">Select Condition</option>
-            <option value="New">New</option>
-            <option value="Gently Used">Gently Used</option>
-            <option value="Used">Used</option>
-          </select>
-        </div>
+              <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', sm: '1fr 1fr' }, gap: 2 }}>
+                <FormControl fullWidth margin="normal" required>
+                  <InputLabel>Category</InputLabel>
+                  <Select
+                    name="category"
+                    value={form.category}
+                    label="Category"
+                    onChange={handleInputChange}
+                  >
+                    {categories.map((cat) => (
+                      <MenuItem key={cat} value={cat}>{cat}</MenuItem>
+                    ))}
+                  </Select>
+                </FormControl>
 
-        {/* Tags */}
-        <div>
-          <label className="block mb-1 font-medium">Tags</label>
-          <input
-            type="text"
-            name="tags"
-            value={formData.tags}
-            onChange={handleChange}
-            placeholder="comma,separated,tags"
-            className="w-full border rounded px-3 py-2"
-          />
-        </div>
+                <FormControl fullWidth margin="normal" required>
+                  <InputLabel>Type</InputLabel>
+                  <Select
+                    name="type"
+                    value={form.type}
+                    label="Type"
+                    onChange={handleInputChange}
+                  >
+                    {types.map((type) => (
+                      <MenuItem key={type} value={type}>{type}</MenuItem>
+                    ))}
+                  </Select>
+                </FormControl>
 
-        <button
-          type="submit"
-          className="px-6 py-2 bg-blue-600 text-white rounded-md font-medium"
-        >
-          Submit Item
-        </button>
-      </form>
-    </div>
+                <FormControl fullWidth margin="normal" required>
+                  <InputLabel>Size</InputLabel>
+                  <Select
+                    name="size"
+                    value={form.size}
+                    label="Size"
+                    onChange={handleInputChange}
+                  >
+                    {sizes.map((size) => (
+                      <MenuItem key={size} value={size}>{size}</MenuItem>
+                    ))}
+                  </Select>
+                </FormControl>
+
+                <FormControl fullWidth margin="normal" required>
+                  <InputLabel>Condition</InputLabel>
+                  <Select
+                    name="condition"
+                    value={form.condition}
+                    label="Condition"
+                    onChange={handleInputChange}
+                  >
+                    {conditions.map((condition) => (
+                      <MenuItem key={condition} value={condition}>{condition}</MenuItem>
+                    ))}
+                  </Select>
+                </FormControl>
+              </Box>
+
+              <TextField
+                label="Tags (comma-separated)"
+                name="tags"
+                value={form.tags}
+                onChange={handleInputChange}
+                fullWidth
+                margin="normal"
+                placeholder="e.g., vintage, denim, casual, streetwear"
+                helperText="Add relevant tags to help others find your item"
+              />
+
+              {/* Image Upload */}
+              <Typography variant="h6" gutterBottom sx={{ mt: 4 }}>
+                Images
+              </Typography>
+
+              <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
+                Upload up to 5 images of your item. First image will be the main photo.
+              </Typography>
+
+              <input
+                accept="image/*"
+                style={{ display: 'none' }}
+                id="image-upload"
+                multiple
+                type="file"
+                onChange={handleImageChange}
+              />
+              <label htmlFor="image-upload">
+                <Button
+                  variant="outlined"
+                  component="span"
+                  sx={{ mb: 2 }}
+                >
+                  Choose Images
+                </Button>
+              </label>
+
+              {images.length > 0 && (
+                <Box sx={{ mt: 2 }}>
+                  <Typography variant="subtitle2" gutterBottom>
+                    Selected Images ({images.length}/5):
+                  </Typography>
+                  <Box sx={{ display: 'flex', gap: 1, flexWrap: 'wrap' }}>
+                    {images.map((image, index) => (
+                      <Box key={index} sx={{ position: 'relative' }}>
+                        <img
+                          src={URL.createObjectURL(image)}
+                          alt={`Preview ${index + 1}`}
+                          style={{
+                            width: 100,
+                            height: 100,
+                            objectFit: 'cover',
+                            borderRadius: 4
+                          }}
+                        />
+                        <IconButton
+                          size="small"
+                          sx={{
+                            position: 'absolute',
+                            top: -8,
+                            right: -8,
+                            bgcolor: 'error.main',
+                            color: 'white',
+                            '&:hover': { bgcolor: 'error.dark' }
+                          }}
+                          onClick={() => removeImage(index)}
+                        >
+                          ×
+                        </IconButton>
+                      </Box>
+                    ))}
+                  </Box>
+                </Box>
+              )}
+
+              {/* Submit Button */}
+              <Box sx={{ mt: 4, display: 'flex', gap: 2 }}>
+                <Button
+                  type="submit"
+                  variant="contained"
+                  color="primary"
+                  disabled={loading || !form.title || !form.description || !form.category || !form.type || !form.size || !form.condition}
+                  sx={{ minWidth: 120 }}
+                >
+                  {loading ? (
+                    <>
+                      <CircularProgress size={20} sx={{ mr: 1 }} />
+                      Submitting...
+                    </>
+                  ) : (
+                    'Submit Item'
+                  )}
+                </Button>
+
+                <Button
+                  variant="outlined"
+                  onClick={() => navigate('/dashboard')}
+                  disabled={loading}
+                >
+                  Cancel
+                </Button>
+              </Box>
+            </Box>
+          </CardContent>
+        </Card>
+      </Container>
+    </>
   );
 };
 

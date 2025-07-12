@@ -1,7 +1,8 @@
-import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
+import React, { createContext, useContext, useState, useEffect, type ReactNode } from 'react';
 import API from '../services/api';
 
 interface User {
+    _id: string;
     name: string;
     email: string;
     points: number;

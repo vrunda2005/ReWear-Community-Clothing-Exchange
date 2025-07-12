@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { useNavigate } from 'react-router-dom';
 import {
@@ -13,32 +13,92 @@ import {
   ListItemText,
   AppBar,
   Toolbar,
-  IconButton
+  IconButton,
+  Grid,
+  Chip,
+  CircularProgress,
+  Alert
 } from '@mui/material';
+import API from '../services/api';
 
+interface Item {
+  _id: string;
+  title: string;
+  description: string;
+  images: string[];
+  category: string;
+  condition: string;
+  status: string;
+  approved: boolean;
+  createdAt: string;
+}
+
+interface Swap {
+  _id: string;
+  item: Item;
+  type: 'swap' | 'points';
+  status: 'pending' | 'approved' | 'rejected' | 'completed';
+  createdAt: string;
+}
 
 const Dashboard = () => {
   const { user, logout } = useAuth();
   const navigate = useNavigate();
+  const [myItems, setMyItems] = useState<Item[]>([]);
+  const [mySwaps, setMySwaps] = useState<Swap[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
+
+  useEffect(() => {
+    const fetchDashboardData = async () => {
+      try {
+        const [itemsResponse, swapsResponse] = await Promise.all([
+          API.get('/items/my/items'),
+          API.get('/swaps/my')
+        ]);
+        setMyItems(itemsResponse.data);
+        setMySwaps(swapsResponse.data);
+      } catch (err: any) {
+        setError(err.response?.data?.message || 'Error loading dashboard data');
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchDashboardData();
+  }, []);
 
   const handleLogout = () => {
     logout();
     navigate('/');
   };
 
-  // Dummy data for now
-  const uploadedItems = [
-    { id: 1, title: 'Denim Jacket', status: 'Available' },
-    { id: 2, title: 'Red Saree', status: 'Swapped' },
-  ];
+  const getStatusColor = (status: string) => {
+    switch (status) {
+      case 'pending': return 'warning';
+      case 'approved': return 'success';
+      case 'rejected': return 'error';
+      case 'completed': return 'info';
+      default: return 'default';
+    }
+  };
 
-  const swaps = [
-    { id: 1, item: 'Blue Kurti', status: 'Ongoing' },
-    { id: 2, item: 'Woolen Scarf', status: 'Completed' },
-  ];
+  const getApprovalStatus = (approved: boolean) => {
+    return approved ?
+      <Chip label="Approved" color="success" size="small" /> :
+      <Chip label="Pending" color="warning" size="small" />;
+  };
 
   if (!user) {
-    return null; // This shouldn't happen due to ProtectedRoute
+    return null;
+  }
+
+  if (loading) {
+    return (
+      <Box display="flex" justifyContent="center" alignItems="center" minHeight="100vh">
+        <CircularProgress />
+      </Box>
+    );
   }
 
   return (
@@ -55,54 +115,130 @@ const Dashboard = () => {
       </AppBar>
 
       <Container maxWidth="lg" sx={{ mt: 4 }}>
+        {error && (
+          <Alert severity="error" sx={{ mb: 3 }}>
+            {error}
+          </Alert>
+        )}
+
         <Typography variant="h4" gutterBottom>
           Welcome, {user.name}!
         </Typography>
 
+        {/* Profile Card */}
         <Card sx={{ mb: 4 }}>
           <CardContent>
             <Typography variant="h6" gutterBottom>Your Profile</Typography>
-            <Typography><strong>Email:</strong> {user.email}</Typography>
-            <Typography><strong>Points:</strong> {user.points}</Typography>
-            <Typography><strong>Role:</strong> {user.isAdmin ? 'Admin' : 'User'}</Typography>
+            <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', sm: '1fr 1fr' }, gap: 2 }}>
+              <Box>
+                <Typography><strong>Email:</strong> {user.email}</Typography>
+                <Typography><strong>Points:</strong> {user.points}</Typography>
+              </Box>
+              <Box>
+                <Typography><strong>Role:</strong> {user.isAdmin ? 'Admin' : 'User'}</Typography>
+                <Typography><strong>Member since:</strong> {new Date().toLocaleDateString()}</Typography>
+              </Box>
+            </Box>
           </CardContent>
         </Card>
 
-        <Box sx={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 3 }}>
-          <Card>
-            <CardContent>
-              <Typography variant="h6" gutterBottom>Your Uploaded Items</Typography>
-              <List>
-                {uploadedItems.map(item => (
-                  <ListItem key={item.id}>
-                    <ListItemText
-                      primary={item.title}
-                      secondary={`Status: ${item.status}`}
-                    />
-                  </ListItem>
-                ))}
-              </List>
-            </CardContent>
-          </Card>
+        <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', md: '1fr 1fr' }, gap: 3 }}>
+          {/* My Uploaded Items */}
+          <Box>
+            <Card>
+              <CardContent>
+                <Box display="flex" justifyContent="space-between" alignItems="center" mb={2}>
+                  <Typography variant="h6">Your Uploaded Items</Typography>
+                  <Button
+                    variant="outlined"
+                    size="small"
+                    onClick={() => navigate('/list-item')}
+                  >
+                    Add New
+                  </Button>
+                </Box>
+                {myItems.length > 0 ? (
+                  <List>
+                    {myItems.map((item) => (
+                      <ListItem key={item._id} divider>
+                        <ListItemText
+                          primary={
+                            <Box display="flex" justifyContent="space-between" alignItems="center">
+                              <Typography variant="subtitle1">{item.title}</Typography>
+                              {getApprovalStatus(item.approved)}
+                            </Box>
+                          }
+                          secondary={
+                            <Box>
+                              <Typography variant="body2" color="text.secondary">
+                                {item.description.substring(0, 100)}...
+                              </Typography>
+                              <Box display="flex" gap={1} mt={1}>
+                                <Chip label={item.category} size="small" />
+                                <Chip label={item.condition} size="small" />
+                                <Chip label={item.status} size="small" color={getStatusColor(item.status) as any} />
+                              </Box>
+                            </Box>
+                          }
+                        />
+                      </ListItem>
+                    ))}
+                  </List>
+                ) : (
+                  <Typography color="text.secondary" textAlign="center" py={2}>
+                    No items uploaded yet.
+                  </Typography>
+                )}
+              </CardContent>
+            </Card>
+          </Box>
 
-          <Card>
-            <CardContent>
-              <Typography variant="h6" gutterBottom>Your Swaps</Typography>
-              <List>
-                {swaps.map(swap => (
-                  <ListItem key={swap.id}>
-                    <ListItemText
-                      primary={swap.item}
-                      secondary={`Status: ${swap.status}`}
-                    />
-                  </ListItem>
-                ))}
-              </List>
-            </CardContent>
-          </Card>
+          {/* My Swaps */}
+          <Box>
+            <Card>
+              <CardContent>
+                <Typography variant="h6" gutterBottom>Your Swaps</Typography>
+                {mySwaps.length > 0 ? (
+                  <List>
+                    {mySwaps.map((swap) => (
+                      <ListItem key={swap._id} divider>
+                        <ListItemText
+                          primary={
+                            <Box display="flex" justifyContent="space-between" alignItems="center">
+                              <Typography variant="subtitle1">{swap.item.title}</Typography>
+                              <Chip
+                                label={swap.status}
+                                size="small"
+                                color={getStatusColor(swap.status) as any}
+                              />
+                            </Box>
+                          }
+                          secondary={
+                            <Box>
+                              <Typography variant="body2" color="text.secondary">
+                                Type: {swap.type === 'swap' ? 'Item Swap' : 'Points Redemption'}
+                              </Typography>
+                              <Typography variant="body2" color="text.secondary">
+                                Requested: {new Date(swap.createdAt).toLocaleDateString()}
+                              </Typography>
+                            </Box>
+                          }
+                        />
+                      </ListItem>
+                    ))}
+                  </List>
+                ) : (
+                  <Typography color="text.secondary" textAlign="center" py={2}>
+                    No swap requests yet.
+                  </Typography>
+                )}
+              </CardContent>
+            </Card>
+          </Box>
         </Box>
 
-        <Box sx={{ mt: 4, display: 'flex', gap: 2 }}>
+        {/* Action Buttons */}
+        <Box sx={{ mt: 4, display: 'flex', gap: 2, flexWrap: 'wrap' }}>
           <Button
             variant="contained"
             color="primary"
@@ -110,6 +246,22 @@ const Dashboard = () => {
           >
             Add New Item
           </Button>
+          <Button
+            variant="outlined"
+            color="primary"
+            onClick={() => navigate('/')}
+          >
+            Browse Items
+          </Button>
+          {user.isAdmin && (
+            <Button
+              variant="outlined"
+              color="secondary"
+              onClick={() => navigate('/admin')}
+            >
+              Admin Panel
+            </Button>
+          )}
           <Button
             variant="outlined"
             color="secondary"

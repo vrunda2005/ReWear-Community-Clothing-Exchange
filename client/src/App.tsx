@@ -7,6 +7,7 @@ import Dashboard from './pages/Dashboard';
 import LandingPage from './pages/Landingpage';
 import ItemDetail from './pages/ItemDetail';
 import AddItem from './pages/AddItem';
+import AdminPanel from './pages/AdminPanel';
 
 function App() {
   return (
@@ -29,6 +30,11 @@ function App() {
           <Route path="/item/:id" element={
             <ProtectedRoute>
               <ItemDetail />
+            </ProtectedRoute>
+          } />
+          <Route path="/admin" element={
+            <ProtectedRoute>
+              <AdminPanel />
             </ProtectedRoute>
           } />
         </Routes>
