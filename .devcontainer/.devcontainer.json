@@ -1,0 +1,15 @@
+// .devcontainer/devcontainer.json
+{
+  "name": "ReWear Codespace",
+  "image": "mcr.microsoft.com/devcontainers/javascript-node:20",
+  "features": {
+    "ghcr.io/devcontainers/features/docker-in-docker:2": {}
+  },
+  "extensions": [
+    "esbenp.prettier-vscode",
+    "dbaeumer.vscode-eslint",
+    "bradlc.vscode-tailwindcss"
+  ],
+  "postCreateCommand": "npm install",
+  "remoteUser": "node"
+}
