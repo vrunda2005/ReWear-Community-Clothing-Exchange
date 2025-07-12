@@ -2,6 +2,9 @@ import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import Signup from './components/auth/Signup';
 import Login from './components/auth/Login';
 import Dashboard from './pages/Dashboard';
+import LandingPage from './pages/Landingpage';
+import ItemDetail from './pages/ItemDetail'; 
+import AddItem from './pages/AddItem'; // at the top
 
 function App() {
   return (
@@ -11,6 +14,9 @@ function App() {
         <Route path="/signup" element={<Signup />} />
         <Route path="/login" element={<Login />} />
         <Route path="/dashboard" element={<Dashboard />} />
+        <Route path="/" element={<LandingPage />} />
+        <Route path="/list-item" element={<AddItem />} />
+        <Route path="/item/:id" element={<ItemDetail />} />
       </Routes>
     </Router>
   );
