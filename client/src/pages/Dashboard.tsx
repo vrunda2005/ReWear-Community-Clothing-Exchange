@@ -1,55 +1,68 @@
 import React from 'react';
 
-const Dashboard = () => {
-  // Dummy data for now
-  const user = {
-    name: 'Devashree',
-    email: 'devashree@example.com',
-    points: 120,
-  };
+const mockUser = {
+  name: "Devashree",
+  email: "dev@example.com",
+  profilePic: "/images/avatar1.png",
+  points: 120,
+};
 
-  const uploadedItems = [
-    { id: 1, title: 'Denim Jacket', status: 'Available' },
-    { id: 2, title: 'Red Saree', status: 'Swapped' },
-  ];
+const mockListings = [
+  { id: 1, title: "Yellow Kurti", image: "/images/product1.jpg" },
+  { id: 2, title: "Black Jeans", image: "/images/product2.jpg" },
+];
 
-  const swaps = [
-    { id: 1, item: 'Blue Kurti', status: 'Ongoing' },
-    { id: 2, item: 'Woolen Scarf', status: 'Completed' },
-  ];
+const mockSwaps = [
+  { id: 3, title: "Pink Hoodie", image: "/images/product3.jpg" },
+  { id: 4, title: "Formal Shirt", image: "/images/product4.jpg" },
+];
 
+const UserDashboard = () => {
   return (
-    <div className="p-6">
-      <h1 className="text-2xl font-bold mb-4">Welcome, {user.name}</h1>
+    <div className="p-6 max-w-6xl mx-auto">
+      <h1 className="text-2xl font-bold mb-6">Welcome, {mockUser.name}</h1>
 
-      <div className="bg-white shadow rounded-lg p-4 mb-6">
-        <p><strong>Email:</strong> {user.email}</p>
-        <p><strong>Points:</strong> {user.points}</p>
+      {/* Profile Overview */}
+      <div className="bg-white shadow p-6 rounded-md flex items-center gap-6 mb-8">
+        <img
+          src={mockUser.profilePic}
+          alt="Profile"
+          className="w-20 h-20 rounded-full object-cover"
+        />
+        <div>
+          <h2 className="text-xl font-semibold">{mockUser.name}</h2>
+          <p className="text-gray-500">{mockUser.email}</p>
+          <p className="mt-2 text-sm font-medium">Points Balance: {mockUser.points}</p>
+        </div>
       </div>
 
-      <div className="mb-6">
-        <h2 className="text-xl font-semibold mb-2">Your Uploaded Items</h2>
-        <ul className="space-y-2">
-          {uploadedItems.map(item => (
-            <li key={item.id} className="p-2 bg-gray-100 rounded-md">
-              {item.title} — <span className="text-sm italic">{item.status}</span>
-            </li>
+      {/* My Listings */}
+      <div className="mb-8">
+        <h3 className="text-xl font-semibold mb-4">My Listings</h3>
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+          {mockListings.map((item) => (
+            <div key={item.id} className="bg-gray-100 rounded shadow p-2">
+              <img src={item.image} alt={item.title} className="w-full h-40 object-cover rounded" />
+              <p className="text-center mt-2 font-medium">{item.title}</p>
+            </div>
           ))}
-        </ul>
+        </div>
       </div>
 
+      {/* My Swaps */}
       <div>
-        <h2 className="text-xl font-semibold mb-2">Your Swaps</h2>
-        <ul className="space-y-2">
-          {swaps.map(swap => (
-            <li key={swap.id} className="p-2 bg-gray-100 rounded-md">
-              {swap.item} — <span className="text-sm italic">{swap.status}</span>
-            </li>
+        <h3 className="text-xl font-semibold mb-4">My Swaps</h3>
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+          {mockSwaps.map((item) => (
+            <div key={item.id} className="bg-gray-100 rounded shadow p-2">
+              <img src={item.image} alt={item.title} className="w-full h-40 object-cover rounded" />
+              <p className="text-center mt-2 font-medium">{item.title}</p>
+            </div>
           ))}
-        </ul>
+        </div>
       </div>
     </div>
   );
 };
 
-export default Dashboard;
+export default UserDashboard;

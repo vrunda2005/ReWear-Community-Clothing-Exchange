@@ -5,6 +5,7 @@ import Dashboard from './pages/Dashboard';
 import LandingPage from './pages/Landingpage';
 import ItemDetail from './pages/ItemDetail'; 
 import AddItem from './pages/AddItem'; // at the top
+import AdminPanel from './pages/AdminPanel'; // Add this
 
 function App() {
   return (
@@ -16,6 +17,7 @@ function App() {
         <Route path="/dashboard" element={<Dashboard />} />
         <Route path="/" element={<LandingPage />} />
         <Route path="/list-item" element={<AddItem />} />
+        <Route path="/admin" element={<AdminPanel />} />
         <Route path="/item/:id" element={<ItemDetail />} />
       </Routes>
     </Router>

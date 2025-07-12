@@ -22,13 +22,22 @@ export default function LandingPage() {
       <header className="bg-white shadow">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex items-center justify-between h-16">
           <div className="text-2xl font-bold">ReWear</div>
-          <nav className="space-x-6">
-            <a href="#" className="hover:underline">Home</a>
+         <nav className="space-x-6 flex items-center">
+            <a href="/" className="hover:underline">Home</a>
             <a href="#browse" className="hover:underline">Browse</a>
             <a href="/list-item" className="hover:underline">List an Item</a>
             <a href="/login" className="hover:underline">Login</a>
             <a href="/signup" className="font-semibold hover:underline">Sign Up</a>
-          </nav>
+            {/* Profile Icon → Dashboard */}
+          <a href="/dashboard">
+            <img
+              src="/images/avatar1.png" // use a placeholder or user's profile image later
+              alt="Profile"
+              className="w-8 h-8 rounded-full border border-gray-300 hover:scale-105 transition"
+            />
+          </a>
+        </nav>
+
         </div>
       </header>
 
