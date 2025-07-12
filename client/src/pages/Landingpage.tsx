@@ -1,4 +1,5 @@
 import React from 'react';
+import { useNavigate } from 'react-router-dom';
 
 const categories = ['Tops', 'T-Shirts', 'Jeans', 'Formals', 'Ethnic-wear'];
 const featuredItems = [
@@ -13,6 +14,8 @@ const products = Array.from({ length: 8 }).map((_, i) => ({
 }));
 
 export default function LandingPage() {
+  const navigate = useNavigate();
+
   return (
     <div className="min-h-screen bg-white text-black">
       {/* Header */}
@@ -59,6 +62,12 @@ export default function LandingPage() {
             >
               List an Item
             </a>
+            <button
+              onClick={() => navigate('/dashboard')}
+              className="px-6 py-3 bg-green-600 text-white rounded-md font-medium"
+            >
+              Go to Dashboard
+            </button>
           </div>
           <div className="mt-6 w-full max-w-xl">
             <input
@@ -87,7 +96,7 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* Featured Carousel (static grid for placeholder) */}
+      {/* Featured Carousel */}
       <section id="browse" className="py-12 bg-gray-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <h2 className="text-2xl font-bold mb-6">Featured Items</h2>
@@ -113,9 +122,7 @@ export default function LandingPage() {
       {/* Product Listings */}
       <section className="py-12 bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <h2 className="text-2xl font-bold mb-6">
-            All Items
-          </h2>
+          <h2 className="text-2xl font-bold mb-6">All Items</h2>
           <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-6">
             {products.map((prod) => (
               <div key={prod.id} className="bg-gray-100 rounded-lg overflow-hidden">
@@ -125,9 +132,7 @@ export default function LandingPage() {
                   className="h-40 w-full object-cover filter grayscale"
                 />
                 <div className="p-3">
-                  <h4 className="text-md font-medium">
-                    {prod.title}
-                  </h4>
+                  <h4 className="text-md font-medium">{prod.title}</h4>
                 </div>
               </div>
             ))}

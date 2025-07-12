@@ -1,36 +1,55 @@
-import { Container, Typography, Button } from '@mui/material';
-import { useNavigate } from 'react-router-dom';
-import { useEffect, useState } from 'react';
+import React from 'react';
 
 const Dashboard = () => {
-    const navigate = useNavigate();
-    const [tokenChecked, setTokenChecked] = useState(false);
-    const [token, setToken] = useState<string | null>(null);
+  // Dummy data for now
+  const user = {
+    name: 'Devashree',
+    email: 'devashree@example.com',
+    points: 120,
+  };
 
-    useEffect(() => {
-        const storedToken = localStorage.getItem('token');
-        if (!storedToken) {
-            navigate('/login');
-        } else {
-            setToken(storedToken);
-        }
-        setTokenChecked(true);
-    }, [navigate]);
+  const uploadedItems = [
+    { id: 1, title: 'Denim Jacket', status: 'Available' },
+    { id: 2, title: 'Red Saree', status: 'Swapped' },
+  ];
 
-    const handleLogout = () => {
-        localStorage.removeItem('token');
-        navigate('/login');
-    };
+  const swaps = [
+    { id: 1, item: 'Blue Kurti', status: 'Ongoing' },
+    { id: 2, item: 'Woolen Scarf', status: 'Completed' },
+  ];
 
-    // Avoid rendering anything until token check is done
-    if (!tokenChecked) return null;
+  return (
+    <div className="p-6">
+      <h1 className="text-2xl font-bold mb-4">Welcome, {user.name}</h1>
 
-    return (
-        <Container>
-            <Typography variant="h4" gutterBottom>Welcome to Dashboard!</Typography>
-            <Button variant="outlined" onClick={handleLogout} sx={{ mt: 2 }}>Logout</Button>
-        </Container>
-    );
+      <div className="bg-white shadow rounded-lg p-4 mb-6">
+        <p><strong>Email:</strong> {user.email}</p>
+        <p><strong>Points:</strong> {user.points}</p>
+      </div>
+
+      <div className="mb-6">
+        <h2 className="text-xl font-semibold mb-2">Your Uploaded Items</h2>
+        <ul className="space-y-2">
+          {uploadedItems.map(item => (
+            <li key={item.id} className="p-2 bg-gray-100 rounded-md">
+              {item.title} — <span className="text-sm italic">{item.status}</span>
+            </li>
+          ))}
+        </ul>
+      </div>
+
+      <div>
+        <h2 className="text-xl font-semibold mb-2">Your Swaps</h2>
+        <ul className="space-y-2">
+          {swaps.map(swap => (
+            <li key={swap.id} className="p-2 bg-gray-100 rounded-md">
+              {swap.item} — <span className="text-sm italic">{swap.status}</span>
+            </li>
+          ))}
+        </ul>
+      </div>
+    </div>
+  );
 };
 
 export default Dashboard;
