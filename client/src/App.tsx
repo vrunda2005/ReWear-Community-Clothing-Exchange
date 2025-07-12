@@ -5,6 +5,10 @@ import Signup from './components/auth/Signup';
 import Login from './components/auth/Login';
 import Dashboard from './pages/Dashboard';
 import LandingPage from './pages/Landingpage';
+import ItemDetail from './pages/ItemDetail'; 
+import AddItem from './pages/AddItem'; // at the top
+import AdminPanel from './pages/AdminPanel'; // Add this
+    
 import ItemDetail from './pages/ItemDetail';
 import AddItem from './pages/AddItem';
 import AdminPanel from './pages/AdminPanel';
