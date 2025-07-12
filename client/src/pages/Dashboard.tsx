@@ -14,7 +14,6 @@ import {
   AppBar,
   Toolbar,
   IconButton,
-  Grid,
   Chip,
   CircularProgress,
   Alert
@@ -59,6 +58,7 @@ const Dashboard = () => {
         setMyItems(itemsResponse.data);
         setMySwaps(swapsResponse.data);
       } catch (err: any) {
+        console.error('Dashboard fetch error:', err);
         setError(err.response?.data?.message || 'Error loading dashboard data');
       } finally {
         setLoading(false);
@@ -89,9 +89,7 @@ const Dashboard = () => {
       <Chip label="Pending" color="warning" size="small" />;
   };
 
-  if (!user) {
-    return null;
-  }
+  if (!user) return null;
 
   if (loading) {
     return (
@@ -115,17 +113,13 @@ const Dashboard = () => {
       </AppBar>
 
       <Container maxWidth="lg" sx={{ mt: 4 }}>
-        {error && (
-          <Alert severity="error" sx={{ mb: 3 }}>
-            {error}
-          </Alert>
-        )}
+        {error && <Alert severity="error" sx={{ mb: 3 }}>{error}</Alert>}
 
         <Typography variant="h4" gutterBottom>
           Welcome, {user.name}!
         </Typography>
 
-        {/* Profile Card */}
+        {/* Profile */}
         <Card sx={{ mb: 4 }}>
           <CardContent>
             <Typography variant="h6" gutterBottom>Your Profile</Typography>
@@ -142,18 +136,15 @@ const Dashboard = () => {
           </CardContent>
         </Card>
 
+        {/* Content Grid */}
         <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', md: '1fr 1fr' }, gap: 3 }}>
-          {/* My Uploaded Items */}
+          {/* Items */}
           <Box>
             <Card>
               <CardContent>
                 <Box display="flex" justifyContent="space-between" alignItems="center" mb={2}>
                   <Typography variant="h6">Your Uploaded Items</Typography>
-                  <Button
-                    variant="outlined"
-                    size="small"
-                    onClick={() => navigate('/list-item')}
-                  >
+                  <Button variant="outlined" size="small" onClick={() => navigate('/list-item')}>
                     Add New
                   </Button>
                 </Box>
@@ -161,6 +152,20 @@ const Dashboard = () => {
                   <List>
                     {myItems.map((item) => (
                       <ListItem key={item._id} divider>
+                        {/* ✅ Image preview */}
+                        {item.images?.[0] && (
+                          <img
+                            src={`http://localhost:5000${item.images[0]}`}
+                            alt={item.title}
+                            style={{
+                              width: '80px',
+                              height: '80px',
+                              objectFit: 'cover',
+                              borderRadius: '6px',
+                              marginRight: '10px'
+                            }}
+                          />
+                        )}
                         <ListItemText
                           primary={
                             <Box display="flex" justifyContent="space-between" alignItems="center">
@@ -193,7 +198,7 @@ const Dashboard = () => {
             </Card>
           </Box>
 
-          {/* My Swaps */}
+          {/* Swaps */}
           <Box>
             <Card>
               <CardContent>
@@ -237,36 +242,20 @@ const Dashboard = () => {
           </Box>
         </Box>
 
-        {/* Action Buttons */}
+        {/* Actions */}
         <Box sx={{ mt: 4, display: 'flex', gap: 2, flexWrap: 'wrap' }}>
-          <Button
-            variant="contained"
-            color="primary"
-            onClick={() => navigate('/list-item')}
-          >
+          <Button variant="contained" color="primary" onClick={() => navigate('/list-item')}>
             Add New Item
           </Button>
-          <Button
-            variant="outlined"
-            color="primary"
-            onClick={() => navigate('/')}
-          >
+          <Button variant="outlined" color="primary" onClick={() => navigate('/')}>
             Browse Items
           </Button>
           {user.isAdmin && (
-            <Button
-              variant="outlined"
-              color="secondary"
-              onClick={() => navigate('/admin')}
-            >
+            <Button variant="outlined" color="secondary" onClick={() => navigate('/admin')}>
               Admin Panel
             </Button>
           )}
-          <Button
-            variant="outlined"
-            color="secondary"
-            onClick={handleLogout}
-          >
+          <Button variant="outlined" color="secondary" onClick={handleLogout}>
             Logout
           </Button>
         </Box>

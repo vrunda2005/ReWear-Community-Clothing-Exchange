@@ -141,7 +141,7 @@ const ItemDetail = () => {
                                                     loading="lazy"
                                                     style={{ objectFit: 'cover', width: '100%', height: '100%' }}
                                                     onError={(e) => {
-                                                        e.currentTarget.src = '/images/placeholder.jpg';
+                                                        e.currentTarget.src = 'https://via.placeholder.com/400x300/CCCCCC/666666?text=No+Image';
                                                     }}
                                                 />
                                             </ImageListItem>

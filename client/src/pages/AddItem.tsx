@@ -13,12 +13,12 @@ import {
   InputLabel,
   Select,
   MenuItem,
-  Chip,
   Alert,
   AppBar,
   Toolbar,
   IconButton,
-  CircularProgress
+  CircularProgress,
+  Snackbar
 } from '@mui/material';
 import API from '../services/api';
 
@@ -42,6 +42,7 @@ const AddItem = () => {
   const [images, setImages] = useState<File[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+  const [success, setSuccess] = useState('');
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement> | { target: { name: string; value: unknown } }) => {
     const { name, value } = e.target;
@@ -55,11 +56,31 @@ const AddItem = () => {
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files) {
       const filesArray = Array.from(e.target.files);
+
+      // Validate file count
       if (filesArray.length > 5) {
         setError('Maximum 5 images allowed');
         return;
       }
-      setImages(filesArray);
+
+      // Validate file types and sizes
+      const validFiles = filesArray.filter(file => {
+        if (!file.type.startsWith('image/')) {
+          setError(`${file.name} is not an image file`);
+          return false;
+        }
+        if (file.size > 5 * 1024 * 1024) { // 5MB
+          setError(`${file.name} is too large. Maximum size is 5MB`);
+          return false;
+        }
+        return true;
+      });
+
+      if (validFiles.length !== filesArray.length) {
+        return; // Error already set above
+      }
+
+      setImages(validFiles);
       setError('');
     }
   };
@@ -74,7 +95,9 @@ const AddItem = () => {
 
       // Add form fields
       Object.entries(form).forEach(([key, value]) => {
-        formData.append(key, value);
+        if (value) { // Only add non-empty values
+          formData.append(key, value);
+        }
       });
 
       // Add images
@@ -82,16 +105,34 @@ const AddItem = () => {
         formData.append('images', image);
       });
 
-      await API.post('/items', formData, {
+      const response = await API.post('/items', formData, {
         headers: {
           'Content-Type': 'multipart/form-data',
         },
       });
 
-      alert('Item submitted successfully! It will be reviewed by our team.');
-      navigate('/dashboard');
+      setSuccess(response.data.message || 'Item submitted successfully!');
+
+      // Reset form
+      setForm({
+        title: '',
+        description: '',
+        category: '',
+        type: '',
+        size: '',
+        condition: '',
+        tags: ''
+      });
+      setImages([]);
+
+      // Navigate to dashboard after a short delay
+      setTimeout(() => {
+        navigate('/dashboard');
+      }, 2000);
+
     } catch (err: any) {
-      setError(err.response?.data?.message || 'Error submitting item');
+      const errorMessage = err.response?.data?.message || 'Error submitting item';
+      setError(errorMessage);
     } finally {
       setLoading(false);
     }
@@ -245,7 +286,7 @@ const AddItem = () => {
               </Typography>
 
               <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
-                Upload up to 5 images of your item. First image will be the main photo.
+                Upload up to 5 images of your item. First image will be the main photo. Maximum file size: 5MB each.
               </Typography>
 
               <input
@@ -335,6 +376,14 @@ const AddItem = () => {
           </CardContent>
         </Card>
       </Container>
+
+      {/* Success Snackbar */}
+      <Snackbar
+        open={!!success}
+        autoHideDuration={6000}
+        onClose={() => setSuccess('')}
+        message={success}
+      />
     </>
   );
 };
