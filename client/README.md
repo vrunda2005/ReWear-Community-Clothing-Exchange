@@ -1,69 +1,161 @@
-# React + TypeScript + Vite
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+# ReWear - Community Clothing Exchange
 
-Currently, two official plugins are available:
+A full-stack web application for a community-driven clothing exchange platform.  
+It consists of a React + TypeScript + TailwindCSS frontend** and an Express.js + MongoDB backend, with JWT-based authentication
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+##  Features
 
-## Expanding the ESLint configuration
+- Community-driven clothing exchange platform
+- User signup & login with secure JWT authentication
+- React frontend styled with MUI & TailwindCSS
+- MongoDB database integration
+- Docker-ready development container
+- Fully TypeScript-enabled frontend
+- Linting & formatting with ESLint and Prettier
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+## Tech Stack
 
-```js
-export default tseslint.config([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
+### Frontend (`rewear-client`)
+- [React](https://react.dev/) 18
+- [TypeScript](https://www.typescriptlang.org/)
+- [Vite](https://vitejs.dev/)
+- [TailwindCSS](https://tailwindcss.com/)
+- [Material UI](https://mui.com/)
+- [Axios](https://axios-http.com/)
+- [React Router DOM](https://reactrouter.com/)
+- ESLint & Prettier
 
-      // Remove tseslint.configs.recommended and replace with this
-      ...tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      ...tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      ...tseslint.configs.stylisticTypeChecked,
+### Backend
+- [Node.js](https://nodejs.org/)
+- [Express.js](https://expressjs.com/)
+- [MongoDB](https://www.mongodb.com/) + Mongoose
+- [JWT](https://jwt.io/) for authentication
+- [bcryptjs](https://www.npmjs.com/package/bcryptjs) for password hashing
+- dotenv for configuration
 
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+
+## Project Structure
+
+```
+backend/
+├── server.js
+├── routes/
+│   └── authRoutes.js
+├── controllers/
+│   └── authController.js
+├── config/
+│   └── db.js
+│
+rewear-client/
+├── src/
+│   ├── main.tsx
+│   └── ...
+├── index.html
+├── vite.config.ts
+├── tsconfig.*.json
+│
+.devcontainer/
+│   └── devcontainer.json
+
+## Setup & Installation
+
+### Prerequisites
+- Node.js (v18+ recommended)
+- MongoDB (cloud or local)
+
+### Clone the repository
+bash
+git clone <your-repo-url>
+cd ReWear-Community-Clothing-Exchange
+
+### Backend setup
+bash
+cd backend
+npm install
+
+
+Create `.env` file:
+
+PORT=5000
+MONGO_URI=your-mongodb-uri
+JWT_SECRET=your-secret-key
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
-
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
-
-export default tseslint.config([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+Run backend:
+```bash
+node server.js
 ```
+
+Backend runs on: [http://localhost:5000](http://localhost:5000)
+
+---
+
+### Frontend setup
+```bash
+cd rewear-client
+npm install
+```
+
+Run frontend:
+```bash
+npm run dev
+```
+
+Frontend runs on: [http://localhost:5173](http://localhost:5173)
+
+---
+
+## API Endpoints
+
+### Base URL
+`/api/auth`
+ Method  Endpoint   Description        
+ POST    /signup    Register new user 
+ POST    /login     Login user        
+
+---
+
+##  Environment Variables
+
+Variable      Description               
+`PORT`        Backend server port (default 5000) 
+`MONGO_URI`   MongoDB connection string 
+`JWT_SECRET`  Secret key for JWT        
+
+---
+
+## Dev Container
+
+If using GitHub Codespaces or VS Code Dev Containers:
+- Includes Node.js 20 container
+- Pre-configured with ESLint, Prettier, TailwindCSS extensions
+- Post-create command: `npm install`
+
+---
+
+##  Scripts
+
+### Frontend (`rewear-client`)
+
+ Command            Description                 
+
+`npm run dev`       Start development server   
+`npm run build`     Build production assets    
+`npm run preview`   Preview production build 
+`npm run lint`      Lint the codebase          
+
+### Backend
+ Command            Description           
+
+ `node server.js` Start backend server 
+
+## Contributing
+
+1. Fork the repo
+2. Create your feature branch (`git checkout -b feature/foo`)
+3. Commit your changes (`git commit -m 'Add foo'`)
+4. Push to the branch (`git push origin feature/foo`)
+5. Open a Pull Request
+
+
