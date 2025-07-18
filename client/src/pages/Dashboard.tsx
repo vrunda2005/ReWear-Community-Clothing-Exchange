@@ -143,7 +143,7 @@ const UserDashboard = () => {
             <Card>
               <CardContent>
                 <Box display="flex" justifyContent="space-between" alignItems="center" mb={2}>
-                  <Typography variant="h6">Your Uploaded Items</Typography>
+                  <Typography variant="h6">All Items</Typography>
                   <Button variant="outlined" size="small" onClick={() => navigate('/list-item')}>
                     Add New
                   </Button>
@@ -154,7 +154,7 @@ const UserDashboard = () => {
                       <ListItem key={item._id} divider>
                         {item.images?.[0] && (
                           <img
-                            src={`http://localhost:5000${item.images[0]}`}
+                            src={item.images[0].startsWith('http') ? item.images[0] : `http://localhost:5000${item.images[0]}`}
                             alt={item.title}
                             style={{
                               width: '80px',

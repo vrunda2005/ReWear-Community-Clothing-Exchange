@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from 'react';
-import { useNavigate, Link } from 'react-router-dom';
+import { useState, useEffect } from 'react';
+import { Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import API from '../services/api';
 
@@ -19,22 +19,17 @@ interface Item {
 const categories = ['Tops', 'T-Shirts', 'Jeans', 'Formals', 'Ethnic-wear'];
 
 export default function LandingPage() {
-  const navigate = useNavigate();
   const { user } = useAuth();
 
   const [items, setItems] = useState<Item[]>([]);
   const [loading, setLoading] = useState(true);
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
-
-  const fetchItems = async (category?: string) => {
+  const fetchItems = async () => {
     try {
       setLoading(true);
       const response = await API.get('/items');
-      const data = response.data;
-
-      // Filter if category selected
-      const filtered = category ? data.filter((item: Item) => item.category === category) : data.slice(0, 6);
-      setItems(filtered);
+      console.log("Fetched Items:", response.data); // ← Add this
+      setItems(response.data);
     } catch (error) {
       console.error('Error fetching items:', error);
     } finally {
@@ -42,15 +37,19 @@ export default function LandingPage() {
     }
   };
 
+
   useEffect(() => {
     fetchItems();
   }, []);
 
   const handleCategoryClick = (category: string) => {
     setSelectedCategory(category);
-    fetchItems(category);
     document.getElementById('browse')?.scrollIntoView({ behavior: 'smooth' });
   };
+
+  const filteredItems = selectedCategory
+    ? items.filter((item) => item.category.toLowerCase() === selectedCategory.toLowerCase())
+    : items;
 
   return (
     <div className="min-h-screen bg-white text-black">
@@ -143,7 +142,7 @@ export default function LandingPage() {
       <section id="browse" className="py-12 bg-gray-50">
         <div className="max-w-7xl mx-auto px-4">
           <h2 className="text-2xl font-bold mb-6 text-center">
-            {selectedCategory ? `Items in “${selectedCategory}”` : 'Featured Items'}
+            {selectedCategory ? `Items in “${selectedCategory}”` : 'All Items'}
           </h2>
 
           {loading ? (
@@ -151,9 +150,9 @@ export default function LandingPage() {
               <div className="animate-spin h-8 w-8 border-4 border-green-600 border-t-transparent rounded-full mx-auto"></div>
               <p className="mt-2 text-gray-600">Loading items...</p>
             </div>
-          ) : items.length > 0 ? (
+          ) : filteredItems.length > 0 ? (
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-              {items.map((item) => (
+              {filteredItems.map((item) => (
                 <div key={item._id} className="bg-white rounded shadow hover:shadow-md transition overflow-hidden">
                   <img
                     src={item.images[0] || 'https://via.placeholder.com/400x300/CCCCCC/666666?text=No+Image'}

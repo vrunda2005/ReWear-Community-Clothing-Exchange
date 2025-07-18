@@ -3,10 +3,16 @@ const dotenv = require('dotenv');
 const cors = require('cors');
 const connectDB = require('./config/db');
 const errorHandler = require('./middleware/errorMiddleware');
+const initializeAdminUser = require('./utils/adminInitalize'); 
+
 const path = require('path');
 
 dotenv.config();
-connectDB();
+connectDB().then(()=>{
+      console.log('Database connection established. Now initializing admin user...');
+
+    initializeAdminUser(); 
+});
 
 const app = express();
 

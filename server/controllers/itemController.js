@@ -54,6 +54,7 @@ exports.createItem = async (req, res) => {
 exports.getAllItems = async (req, res) => {
   try {
     const items = await Item.find({ approved: true }).populate('uploader', 'name email avatarUrl');
+    
     res.json(items);
   } catch (err) {
     console.error('Get All Items Error:', err);
