@@ -15,7 +15,7 @@ const demoItems: SwapItem[] = [
 ];
 
 const SwapSwiper: React.FC = () => {
-  const [items, setItems] = useState<SwapItem[]>(demoItems);
+  const [items] = useState<SwapItem[]>(demoItems);
   const [swapped, setSwapped] = useState<SwapItem | null>(null);
 
   const handleSwipe = (direction: string, item: SwapItem): void => {

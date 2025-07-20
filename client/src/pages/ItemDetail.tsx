@@ -28,21 +28,21 @@ import {
 } from '@mui/material';
 import API from '../services/api';
 
-const dummyItem = {
-    id: 1,
-    title: 'Vintage Denim Jacket',
-    description: 'Classic 90s denim jacket in great condition. Lightly used, fits medium-large, made of 100% cotton.',
-    images: [
-        '/images/featured1.jpg',
-        '/images/featured2.jpg',
-        '/images/featured3.jpg',
-    ],
-    uploader: {
-        name: 'Aarav Shah',
-        email: 'aarav@example.com',
-    },
-    status: 'Available',
-};
+// const dummyItem = {
+//     id: 1,
+//     title: 'Vintage Denim Jacket',
+//     description: 'Classic 90s denim jacket in great condition. Lightly used, fits medium-large, made of 100% cotton.',
+//     images: [
+//         '/images/featured1.jpg',
+//         '/images/featured2.jpg',
+//         '/images/featured3.jpg',
+//     ],
+//     uploader: {
+//         name: 'Aarav Shah',
+//         email: 'aarav@example.com',
+//     },
+//     status: 'Available',
+// };
 
 
 
