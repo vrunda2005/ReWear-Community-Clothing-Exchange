@@ -7,13 +7,8 @@ exports.createItem = async (req, res) => {
   try {
     const { title, description, category, type, size, condition, tags } = req.body;
     
-   let images = [];
-    if (req.files && req.files.length > 0) {
-      images = req.files.map(file => ({
-        url: file.path,
-        filename: file.filename
-      }));
-    }
+    const imageUrls = req.files.map(file => file.path); // Cloudinary gives file.path as URL
+
 
     // Validate required fields
     if (!title || !description || !category || !type || !size || !condition) {
@@ -30,7 +25,7 @@ exports.createItem = async (req, res) => {
       size,
       condition,
       tags: tags ? tags.split(',').map(t => t.trim()) : [],
-      images,
+      images:imageUrls,
       uploader: req.user.userId,
       status: 'pending',
       approved: false
