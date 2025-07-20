@@ -18,6 +18,7 @@ import {
   CircularProgress,
   Alert
 } from '@mui/material';
+import LogoutIcon from '@mui/icons-material/Logout';
 import API from '../services/api';
 
 interface Item {
@@ -83,11 +84,9 @@ const UserDashboard = () => {
     }
   };
 
-  const getApprovalStatus = (approved: boolean) => {
-    return approved ?
-      <Chip label="Approved" color="success" size="small" /> :
-      <Chip label="Pending" color="warning" size="small" />;
-  };
+  const getApprovalStatus = (approved: boolean) => (
+    <Chip label={approved ? 'Approved' : 'Pending'} color={approved ? 'success' : 'warning'} size="small" />
+  );
 
   if (!user) return null;
 
@@ -107,7 +106,7 @@ const UserDashboard = () => {
             ReWear Dashboard
           </Typography>
           <IconButton color="inherit" onClick={handleLogout}>
-            Logout
+            <LogoutIcon />
           </IconButton>
         </Toolbar>
       </AppBar>
@@ -119,7 +118,7 @@ const UserDashboard = () => {
           Welcome, {user.name}!
         </Typography>
 
-        {/* Profile */}
+        {/* Profile Section */}
         <Card sx={{ mb: 4 }}>
           <CardContent>
             <Typography variant="h6" gutterBottom>Your Profile</Typography>
@@ -130,7 +129,7 @@ const UserDashboard = () => {
               </Box>
               <Box>
                 <Typography><strong>Role:</strong> {user.isAdmin ? 'Admin' : 'User'}</Typography>
-                <Typography><strong>Member since:</strong> {new Date().toLocaleDateString()}</Typography>
+                <Typography><strong>Member since:</strong> {new Date(user.createdAt || Date.now()).toLocaleDateString()}</Typography>
               </Box>
             </Box>
           </CardContent>
@@ -138,23 +137,28 @@ const UserDashboard = () => {
 
         {/* Content Grid */}
         <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', md: '1fr 1fr' }, gap: 3 }}>
-          {/* Items */}
+          {/* Items Section */}
           <Box>
             <Card>
               <CardContent>
                 <Box display="flex" justifyContent="space-between" alignItems="center" mb={2}>
-                  <Typography variant="h6">All Items</Typography>
+                  <Typography variant="h6">Your Items</Typography>
                   <Button variant="outlined" size="small" onClick={() => navigate('/list-item')}>
                     Add New
                   </Button>
                 </Box>
+
                 {myItems.length > 0 ? (
                   <List>
                     {myItems.map((item) => (
-                      <ListItem key={item._id} divider>
+                      <ListItem key={item._id} divider alignItems="flex-start">
                         {item.images?.[0] && (
                           <img
-                            src={item.images[0].startsWith('http') ? item.images[0] : `http://localhost:5000${item.images[0]}`}
+                            src={
+                              item.images[0].startsWith('http')
+                                ? item.images[0]
+                                : `http://localhost:5000${item.images[0]}`
+                            }
                             alt={item.title}
                             style={{
                               width: '80px',
@@ -173,7 +177,7 @@ const UserDashboard = () => {
                             </Box>
                           }
                           secondary={
-                            <Box>
+                            <>
                               <Typography variant="body2" color="text.secondary">
                                 {item.description.substring(0, 100)}...
                               </Typography>
@@ -182,7 +186,7 @@ const UserDashboard = () => {
                                 <Chip label={item.condition} size="small" />
                                 <Chip label={item.status} size="small" color={getStatusColor(item.status) as any} />
                               </Box>
-                            </Box>
+                            </>
                           }
                         />
                       </ListItem>
@@ -197,7 +201,7 @@ const UserDashboard = () => {
             </Card>
           </Box>
 
-          {/* Swaps */}
+          {/* Swaps Section */}
           <Box>
             <Card>
               <CardContent>
@@ -218,14 +222,14 @@ const UserDashboard = () => {
                             </Box>
                           }
                           secondary={
-                            <Box>
+                            <>
                               <Typography variant="body2" color="text.secondary">
                                 Type: {swap.type === 'swap' ? 'Item Swap' : 'Points Redemption'}
                               </Typography>
                               <Typography variant="body2" color="text.secondary">
                                 Requested: {new Date(swap.createdAt).toLocaleDateString()}
                               </Typography>
-                            </Box>
+                            </>
                           }
                         />
                       </ListItem>
@@ -241,18 +245,15 @@ const UserDashboard = () => {
           </Box>
         </Box>
 
-        {/* Actions */}
+        {/* Action Buttons */}
         <Box sx={{ mt: 4, display: 'flex', gap: 2, flexWrap: 'wrap' }}>
-          <Button variant="contained" color="primary" onClick={() => navigate('/list-item')}>
-            Add New Item
-          </Button>
-          <Button variant="outlined" color="primary" onClick={() => navigate('/')}>Browse Items</Button>
+          <Button variant="contained" onClick={() => navigate('/list-item')}>Add New Item</Button>
+          <Button variant="outlined" onClick={() => navigate('/')}>Browse Items</Button>
           {user.isAdmin && (
             <Button variant="outlined" color="secondary" onClick={() => navigate('/admin')}>
               Admin Panel
             </Button>
           )}
-          <Button variant="outlined" color="secondary" onClick={handleLogout}>Logout</Button>
         </Box>
       </Container>
     </>
