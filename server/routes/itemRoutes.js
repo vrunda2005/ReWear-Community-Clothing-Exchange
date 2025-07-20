@@ -2,7 +2,9 @@ const express = require('express');
 const router = express.Router();
 const itemController = require('../controllers/itemController');
 const { authMiddleware, adminMiddleware } = require('../middleware/authMiddleware');
-const upload = require('../middleware/uploadMiddleware');
+const { storage } = require('../config/cloudinary'); // 👈
+const multer = require('multer');
+const upload =multer({storage});
 
 // Public
 router.get('/', itemController.getAllItems);

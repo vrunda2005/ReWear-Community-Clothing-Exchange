@@ -7,10 +7,12 @@ exports.createItem = async (req, res) => {
   try {
     const { title, description, category, type, size, condition, tags } = req.body;
     
-    // Handle image uploads
-    let images = [];
+   let images = [];
     if (req.files && req.files.length > 0) {
-      images = req.files.map(file => `/uploads/${file.filename}`);
+      images = req.files.map(file => ({
+        url: file.path,
+        filename: file.filename
+      }));
     }
 
     // Validate required fields
